@@ -10,4 +10,9 @@ class CLIReader
     {
         return (int)fgets(STDIN);
     }
+
+    public static function readString(): string
+    {
+        return (string)fgets(STDIN);
+    }
 }

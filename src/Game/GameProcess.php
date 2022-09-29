@@ -15,6 +15,8 @@ class GameProcess
     {
         $actualLives = $lives;
 
+        $rescueLive = 1;
+
         do {
             CLIWriter::write("Zgadywana liczba to: ");
 
@@ -30,12 +32,20 @@ class GameProcess
             CLIWriter::writeNl("Zła odpowiedź. Pozostałe próby: {$actualLives}");
 
             if ($actualLives === 0) {
-                try {
-                    $new = new ExceptionTest(ExceptionTest::CUST_EXCEPTION);
-                } catch (GameOverException $exp) {
+                if ($rescueLive === 1) {
+                    $actualDate = new \DateTime("now");
+
+                    $rescueStatement = EndGame::QTERescue($rescueLive, $actualDate);
+
+                    if ($rescueStatement === false) {
+                        throw new GameOverException("Koniec gry");
+                    }else {
+                        $actualLives++;
+
+                        $rescueLive--;
+                    }
+                } else {
                     throw new GameOverException("Koniec gry");
-                } catch (\Exception $exp) {
-                    echo "Default exception is caught here\n", $exp;
                 }
             }
         } while ($lives > 0);
