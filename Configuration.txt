@@ -1,0 +1,3 @@
+Łatwy, 1, 10, TEXT
+Średni, 2, 20, RECTANGLE
+Trudny, 4, 10, TRIANGLE
