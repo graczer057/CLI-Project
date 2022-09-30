@@ -14,10 +14,12 @@ class CalculatorGame implements GameInterface
         $equationFirstNumber = RandomNumbers::randomNumberForExercise(1, 20);
         $equationSecondNumber = RandomNumbers::randomNumberForExercise(1, 20);
 
+        $guessingHint = false;
+
         $correctAnswer = $equationFirstNumber + $equationSecondNumber;
 
         CLIWriter::writeNl("Rozwiąż równanie: " . PHP_EOL . "{$equationFirstNumber} + {$equationSecondNumber} = ?");
 
-        return GameProcess::playGame($correctAnswer, $lives, $rescueLive);
+        return GameProcess::playGame($correctAnswer, $lives, $rescueLive, $guessingHint);
     }
 }

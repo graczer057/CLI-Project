@@ -10,7 +10,7 @@ use App\Utils\GameOverException;
 
 class GameProcess
 {
-    public static function playGame(int $correctAnswer, int $lives, int $rescueLive): array
+    public static function playGame(int $correctAnswer, int $lives, int $rescueLive, bool $guessingHint): array
     {
         $actualLives = $lives;
 
@@ -27,6 +27,14 @@ class GameProcess
             $actualLives--;
 
             CLIWriter::writeNl("Zła odpowiedź. Pozostałe próby: {$actualLives}");
+
+            if(($guessingHint === true) && ($actualLives <= 4)) {
+                if ($userAnswer > $correctAnswer) {
+                    CLIWriter::writeNl("Twoja liczba jest większa od zgadywanej liczby, podaj mniejszą liczbę.");
+                } else {
+                    CLIWriter::writeNl("Twoja liczba jest mniejsza od zgadywanje liczby, podaj większą liczbę.");
+                }
+            }
 
             if ($actualLives === 0) {
                 if ($rescueLive === 1) {

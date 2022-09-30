@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use App\Admin\Tasks\TaskFactory;
-use App\Role\RoleChecker;
+use App\Menu\MenuChecker;
 use App\Admin\Password\PasswordChecker;
 use App\Game\GameFactory;
 use App\Game\StartGame;
@@ -19,26 +19,12 @@ class Kernel
     public static function start(): void
     {
         try {
-            $role = RoleChecker::selectRole();
+            $menu = MenuChecker::selectMenu();
         } catch (\Exception $e) {
             die($e->getMessage());
         }
 
-        if ($role->getRole() === "admin") {
-            try {
-                $isAdminVerified = PasswordChecker::typePassword();
-            } catch (\Exception $e) {
-                die($e->getMessage());
-            }
-
-            if($isAdminVerified === true) {
-                TaskFactory::selectTask();
-            } else {
-                $role->setRole("player");
-            }
-        }
-
-        if ($role->getRole() === "player") {
+        if ($menu->getName() === "Graj") {
             try {
                 $level = LevelFactory::selectLevel();
             } catch (\Exception $e) {
@@ -71,6 +57,20 @@ class Kernel
             $secondAnswer = ($games[1] ?? null)?->getResult() ?? rand(0, 100);
 
             PrizeFactory::create($level->getPrizeType(), $firstAnswer, $secondAnswer);
+        } elseif ($menu->getName() === "Ustawienia") {
+            try {
+                $isAdminVerified = PasswordChecker::typePassword();
+            } catch (\Exception $e) {
+                die($e->getMessage());
+            }
+
+            if($isAdminVerified === true) {
+                TaskFactory::selectTask();
+            } else {
+                self::start();
+            }
+        } else {
+            die("Przykro nam, że nas opuszczasz ;(");
         }
     }
 

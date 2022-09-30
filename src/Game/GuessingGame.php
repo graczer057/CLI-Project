@@ -15,10 +15,12 @@ class GuessingGame implements GameInterface
 
         $endGuessingNumberRange = $startGuessingNumberRange + 10;
 
+        $guessingHint = true;
+
         $guessingNumber = RandomNumbers::randomNumberForExercise($startGuessingNumberRange, $endGuessingNumberRange);
 
         CLIWriter::writeNl("Zgadnij liczbę z zakresu od: {$startGuessingNumberRange} do: {$endGuessingNumberRange}");
 
-        return GameProcess::playGame($guessingNumber, $lives, $rescueLive);
+        return GameProcess::playGame($guessingNumber, $lives, $rescueLive, $guessingHint);
     }
 }
