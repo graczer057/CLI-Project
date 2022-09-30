@@ -8,7 +8,7 @@ use App\Level\PrizeType;
 
 class PrizeFactory
 {
-    public static function create(PrizeType $prizeType, int $firstAnswer, int $secondAnswer = null)
+    public static function create(PrizeType $prizeType, int $firstAnswer, int $secondAnswer = null): void
     {
         switch ($prizeType) {
             case PrizeType::TEXT:

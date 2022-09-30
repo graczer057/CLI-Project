@@ -6,13 +6,13 @@ namespace App\Level;
 
 class LevelsFactory
 {
-    public static function levelsFromFile(string $filePath): array
+    public static function levelsFromFile(string $configurationFilePath): array
     {
-        if (!is_file($filePath)) {
+        if (!is_file($configurationFilePath)) {
             throw new \Exception("Nie znaleziono pliku");
         }
 
-        $fileOpen = fopen($filePath, 'r');
+        $fileOpen = fopen($configurationFilePath, 'r');
 
         $levels = [];
 

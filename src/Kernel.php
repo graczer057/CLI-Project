@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
+use App\Admin\Tasks\TaskFactory;
+use App\Role\RoleChecker;
+use App\Admin\Password\PasswordChecker;
 use App\Game\GameFactory;
 use App\Game\StartGame;
 use App\Level\LevelFactory;
@@ -14,30 +19,59 @@ class Kernel
     public static function start(): void
     {
         try {
-            $level = LevelFactory::selectLevel();
+            $role = RoleChecker::selectRole();
         } catch (\Exception $e) {
             die($e->getMessage());
         }
 
-        $games = GameFactory::create($level->getGamesNumber(), $level->getMaxLives());
-
-        $tries = $games[0]->getGamesTries();
-
-        foreach ($games as $game) {
+        if ($role->getRole() === "admin") {
             try {
-                $gameResults = StartGame::run($game, $tries);
-                $tries = $gameResults["tries"];
-                $game->SetResult($gameResults["answer"]);
-            } catch (GameOverException $exception) {
-                CLIWriter::writeNl("Koniec Gry! - Game Over!");
-                die();
+                $isAdminVerified = PasswordChecker::typePassword();
+            } catch (\Exception $e) {
+                die($e->getMessage());
+            }
+
+            if($isAdminVerified === true) {
+                TaskFactory::selectTask();
+            } else {
+                $role->setRole("player");
             }
         }
 
-        $firstAnswer = $games[0]?->getResult() ?? rand(0, 100);
+        if ($role->getRole() === "player") {
+            try {
+                $level = LevelFactory::selectLevel();
+            } catch (\Exception $e) {
+                die($e->getMessage());
+            }
 
-        $secondAnswer = ($games[1] ?? null)?->getResult() ?? rand(0, 100);
+            $games = GameFactory::create($level->getGamesNumber(), $level->getMaxLives());
 
-        PrizeFactory::create($level->getPrizeType(), $firstAnswer, $secondAnswer);
+            $tries = $games[0]->getGamesTries();
+
+            $rescueLive = 1;
+
+            foreach ($games as $game) {
+                try {
+                    $gameResults = StartGame::run($game, $tries, $rescueLive);
+
+                    $tries = $gameResults["tries"];
+
+                    $rescueLive = $gameResults["rescueLive"];
+
+                    $game->SetResult($gameResults["answer"]);
+                } catch (GameOverException $exception) {
+                    CLIWriter::writeNl("Koniec Gry! - Game Over!");
+                    die();
+                }
+            }
+
+            $firstAnswer = $games[0]?->getResult() ?? rand(0, 100);
+
+            $secondAnswer = ($games[1] ?? null)?->getResult() ?? rand(0, 100);
+
+            PrizeFactory::create($level->getPrizeType(), $firstAnswer, $secondAnswer);
+        }
     }
+
 }

@@ -6,5 +6,5 @@ namespace App\Game;
 
 interface GameInterface
 {
-    public static function run(int $lives): array;
+    public static function run(int $lives, int $rescueLive): array;
 }

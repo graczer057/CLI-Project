@@ -9,7 +9,7 @@ use App\Utils\RandomNumbers;
 
 class GuessingGame implements GameInterface
 {
-    public static function run(int $lives): array
+    public static function run(int $lives, int $rescueLive): array
     {
         $startGuessingNumberRange = RandomNumbers::randomNumberForExercise(1, 10);
 
@@ -19,6 +19,6 @@ class GuessingGame implements GameInterface
 
         CLIWriter::writeNl("Zgadnij liczbę z zakresu od: {$startGuessingNumberRange} do: {$endGuessingNumberRange}");
 
-        return GameProcess::playGame($guessingNumber, $lives);
+        return GameProcess::playGame($guessingNumber, $lives, $rescueLive);
     }
 }

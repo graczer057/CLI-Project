@@ -9,7 +9,7 @@ use App\Utils\RandomNumbers;
 
 class CalculatorGame implements GameInterface
 {
-    public static function run(int $lives): array
+    public static function run(int $lives, int $rescueLive): array
     {
         $equationFirstNumber = RandomNumbers::randomNumberForExercise(1, 20);
         $equationSecondNumber = RandomNumbers::randomNumberForExercise(1, 20);
@@ -18,6 +18,6 @@ class CalculatorGame implements GameInterface
 
         CLIWriter::writeNl("Rozwiąż równanie: " . PHP_EOL . "{$equationFirstNumber} + {$equationSecondNumber} = ?");
 
-        return GameProcess::playGame($correctAnswer, $lives);
+        return GameProcess::playGame($correctAnswer, $lives, $rescueLive);
     }
 }

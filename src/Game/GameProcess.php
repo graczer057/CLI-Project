@@ -6,16 +6,13 @@ namespace App\Game;
 
 use App\Utils\CLIReader;
 use App\Utils\CLIWriter;
-use App\Utils\ExceptionTest;
 use App\Utils\GameOverException;
 
 class GameProcess
 {
-    public static function playGame(int $correctAnswer, int $lives): array
+    public static function playGame(int $correctAnswer, int $lives, int $rescueLive): array
     {
         $actualLives = $lives;
-
-        $rescueLive = 1;
 
         do {
             CLIWriter::write("Zgadywana liczba to: ");
@@ -50,6 +47,6 @@ class GameProcess
             }
         } while ($lives > 0);
 
-        return ["answer" => $userAnswer, "tries" => $actualLives];
+        return ["answer" => $userAnswer, "tries" => $actualLives, "rescueLive" => $rescueLive];
     }
 }
