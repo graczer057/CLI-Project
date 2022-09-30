@@ -6,36 +6,22 @@ namespace App\Admin\Password;
 
 class PasswordFactory
 {
-    public static function passwordFromFile(string $passwordFilePath): array
+    public static function passwordFromFile(string $passwordFilePath): string
     {
         if (!is_file($passwordFilePath)) {
             throw new \Exception("Nie znaleziono pliku");
         }
 
-        $openPasswordFile = fopen($passwordFilePath, 'r');
+        $passwordFile = fopen($passwordFilePath, 'r');
 
-        $passwords = [];
+        $password = '';
 
-        $countPasswords = 0;
-
-        while ($line = fgets($openPasswordFile)) {
-            if($countPasswords === 0) {
-                $isActivePassword = true;
-            } else {
-                $isActivePassword = false;
-            }
-
-            $passwords[] = new Password(
-                $countPasswords,
-                trim($line),
-                $isActivePassword
-            );
-
-            $countPasswords++;
+        while ($line = fgets($passwordFile)) {
+            $password = trim($line);
         }
 
-        fclose($openPasswordFile);
+        fclose($passwordFile);
 
-        return $passwords;
+        return $password;
     }
 }

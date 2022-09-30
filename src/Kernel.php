@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Admin\Password\PasswordFactory;
+use App\Admin\Password\PasswordPrompt;
+use App\Admin\Password\securePassword;
 use App\Admin\Tasks\TaskFactory;
 use App\Menu\MenuChecker;
 use App\Admin\Password\PasswordChecker;
@@ -18,6 +21,8 @@ class Kernel
 {
     public static function start(): void
     {
+        securePassword::secureOnAwake();
+
         try {
             $menu = MenuChecker::selectMenu();
         } catch (\Exception $e) {
