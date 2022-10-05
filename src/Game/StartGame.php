@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Game;
 
+use App\Game\GameType\CalculatorGame;
+use App\Game\GameType\GuessingGame;
 use App\Utils\CLIWriter;
 
 class StartGame
 {
-    public static function run(Game $game, int $lives, int $rescueLive): array
+    public static function run(Game $game, int $lives, bool $rescueLive): array
     {
         switch ($game->getGameIndex()) {
             case 1:

@@ -4,79 +4,57 @@ declare(strict_types=1);
 
 namespace App;
 
-use App\Admin\Password\PasswordFactory;
-use App\Admin\Password\PasswordPrompt;
-use App\Admin\Password\securePassword;
-use App\Admin\Tasks\TaskFactory;
-use App\Menu\MenuChecker;
-use App\Admin\Password\PasswordChecker;
-use App\Game\GameFactory;
-use App\Game\StartGame;
-use App\Level\LevelFactory;
-use App\Prize\PrizeFactory;
-use App\Utils\CLIWriter;
-use App\Utils\GameOverException;
+use App\Game\ChooseGame;
+use App\Menu\MenuSelect;
+use App\Menu\MenuType;
+use App\Setting\ChooseSetting;
+use App\Setting\Password\{
+    CheckPassword\PasswordChecker,
+    CheckPassword\VerifyPassword,
+    CreatePassword\CreatePassword,
+    CreatePassword\PasswordHash,
+    PasswordAction\PasswordAction,
+    ResetPassword\PasswordReset
+};
 
 class Kernel
 {
-    public static function start(): void
+    public function __construct(
+        private readonly PasswordChecker $passwordChecker,
+        private readonly CreatePassword $createPassword,
+        private readonly PasswordHash $passwordHash,
+        private readonly VerifyPassword $verifyPasswordFile,
+        private readonly PasswordReset $passwordReset,
+        private readonly ?string $passwordAction,
+    ) {
+
+    }
+
+    public function start(): void
     {
-        securePassword::secureOnAwake();
+        $menu = MenuSelect::select();
 
-        try {
-            $menu = MenuChecker::selectMenu();
-        } catch (\Exception $e) {
-            die($e->getMessage());
-        }
+        $action = match ($menu->getName()) {
+            'Graj' => MenuType::PLAY,
+            'Ustawienia' => MenuType::SETTINGS,
+            'Wyjdź' => MenuType::EXIT,
+        };
 
-        if ($menu->getName() === "Graj") {
-            try {
-                $level = LevelFactory::selectLevel();
-            } catch (\Exception $e) {
-                die($e->getMessage());
-            }
-
-            $games = GameFactory::create($level->getGamesNumber(), $level->getMaxLives());
-
-            $tries = $games[0]->getGamesTries();
-
-            $rescueLive = 1;
-
-            foreach ($games as $game) {
-                try {
-                    $gameResults = StartGame::run($game, $tries, $rescueLive);
-
-                    $tries = $gameResults["tries"];
-
-                    $rescueLive = $gameResults["rescueLive"];
-
-                    $game->SetResult($gameResults["answer"]);
-                } catch (GameOverException $exception) {
-                    CLIWriter::writeNl("Koniec Gry! - Game Over!");
-                    die();
-                }
-            }
-
-            $firstAnswer = $games[0]?->getResult() ?? rand(0, 100);
-
-            $secondAnswer = ($games[1] ?? null)?->getResult() ?? rand(0, 100);
-
-            PrizeFactory::create($level->getPrizeType(), $firstAnswer, $secondAnswer);
-        } elseif ($menu->getName() === "Ustawienia") {
-            try {
-                $isAdminVerified = PasswordChecker::typePassword();
-            } catch (\Exception $e) {
-                die($e->getMessage());
-            }
-
-            if($isAdminVerified === true) {
-                TaskFactory::selectTask();
-            } else {
+        switch ($action) {
+            case MenuType::PLAY:
+                ChooseGame::run();
+                break;
+            case MenuType::SETTINGS:
+                ChooseSetting::run($this->passwordChecker, $this->verifyPasswordFile, $this->createPassword, $this->passwordHash);
                 self::start();
-            }
-        } else {
-            die("Przykro nam, że nas opuszczasz ;(");
+                break;
+            case MenuType::EXIT:
+                die("Żegnaj użytkowniku ;(");
         }
     }
 
+    public function passwordActions(): void
+    {
+        PasswordAction::select($this->passwordAction, $this->createPassword, $this->passwordReset, $this->passwordChecker, $this->passwordHash);
+    }
 }

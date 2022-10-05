@@ -6,16 +6,14 @@ namespace App\Menu;
 
 class MenuFactory
 {
+    private const OPTIONS = ["Graj", "Ustawienia", "Wyjdź"];
+
     public static function menuOptions(): array
     {
-        $menuOptions = [0 => "Graj", 1 => "Ustawienia", 2 => "Wyjdź"];
-
-        foreach ($menuOptions as $menuOption) {
-            $menu[] = new Menu(
-                $menuOption
-            );
+        foreach (self::OPTIONS as $menuOption) {
+            $menu[] = new Menu($menuOption);
         }
 
-        return $menu;
+        return $menu ?? [];
     }
 }
